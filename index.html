@@ -4,23 +4,26 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>LUMI – Fog Sphere</title>
-<style>
-  .header {
-  width: 100%;
-  text-align: center;
-  margin-top: 30px;
-  margin-bottom: 10px;
-}
-.logo {
-  max-width: 560px;
-  height: auto;
-  display: inline-block;
-  opacity: 0.95;
-  filter: brightness(2.8) drop-shadow(0 0 18px rgba(130,180,255,0.6))
-          drop-shadow(0 0 35px rgba(140,120,255,0.4));
-  margin-bottom: 10px;
-}
 
+<style>
+  /* Header + logo */
+  .header {
+    width: 100%;
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 10px;
+  }
+  .logo {
+    max-width: 260px;                 /* <-- larger size  */
+    height: auto;
+    display: inline-block;
+    opacity: 0.95;
+    filter:
+      brightness(2.8)
+      drop-shadow(0 0 18px rgba(130,180,255,0.6))
+      drop-shadow(0 0 35px rgba(140,120,255,0.4)); /* blue-purple glow */
+    margin-bottom: 10px;
+  }
   html,body{margin:0;height:100%;background:#0a0f14;color:#eaf4ff;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
   .app{display:grid;grid-template-columns:minmax(340px,520px) 1fr;gap:24px;align-items:start;padding:24px;max-width:1200px;margin:0 auto}
   .stage{display:grid;place-items:center}
