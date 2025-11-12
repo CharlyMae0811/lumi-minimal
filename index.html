@@ -109,6 +109,19 @@ button:active:not([disabled]) {
 </div>
 
 <script>
+  /* ====== add near top of <script> ====== */
+function getOrCreateSessionId() {
+  const KEY = 'lumi_session_id';
+  let id = localStorage.getItem(KEY);
+  if (!id) {
+    // simple UUID-ish
+    id = 'sess_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem(KEY, id);
+  }
+  return id;
+}
+const SESSION_ID = getOrCreateSessionId();
+
 /* ====== CONFIG: your n8n webhook (JSON) ====== */
 const N8N_WEBHOOK_URL = "https://charly175820478052.app.n8n.cloud/webhook/seller-call-simulation";
 
@@ -212,7 +225,11 @@ async function sendToN8N(text){
     const res = await fetch(N8N_WEBHOOK_URL, {
       method:'POST',
       headers:{ 'Content-Type':'application/json' },
-      body: JSON.stringify({ text, mode: 'answer' })
+      body: JSON.stringify({
+        sessionId: SESSION_ID,   // <-- NEW
+        text,
+        mode: 'answer'
+      })
     });
     if(!res.ok){ replyEl.textContent = `n8n error: ${res.status}`; return; }
     const data = await res.json();
