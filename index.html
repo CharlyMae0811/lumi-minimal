@@ -5,16 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>LUMI – Fog Sphere</title>
 <style>
-  .header {
-  width: 100%;
-  text-align: center;
-  margin-top: 30px;
-  margin-bottom: 10px;
+  .header{
+  width:100%;
+  text-align:center;
+  margin:30px 0 10px;
 }
-.logo {
-  max-width: 180px;
-  filter: brightness(1000%) invert(1); /* makes dark logo white */
-  opacity: 0.9;
+.logo{
+  max-width:180px;
+  height:auto;
+  display:inline-block;
+  /* If the logo is black and you want white: */
+  filter: invert(1) brightness(1000%);
+  opacity:.95;
 }
 
   html,body{margin:0;height:100%;background:#0a0f14;color:#eaf4ff;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
@@ -36,7 +38,7 @@
 <body>
 <!-- HEADER: Logo -->
 <header class="header">
-  <img src="LUMI Logo (1).png" alt="LUMI logo" class="logo" />
+  <img src="l./lumi-logo.png" alt="LUMI logo" class="logo" />
 </header>
 
 <div class="app">
