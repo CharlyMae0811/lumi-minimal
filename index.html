@@ -193,35 +193,41 @@ async function sendToN8N(text, mode){
   }
 }
 
-/* Hold-to-talk using Web Speech API (Chrome/Edge) */
-micBtn.addEventListener('mousedown', async () => {
-  try { await initMic(); } catch(e){ console.error(e); statusEl.textContent='mic: blocked'; return; }
-
-  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (SpeechRec) {
-    rec = new SpeechRec();
-    rec.lang = 'en-US';
-    rec.interimResults = true;
-    rec.continuous = true;
-    rec.onstart = () => statusEl.textContent = 'mic: listening…';
-    rec.onresult = (e) => {
-      let s=''; for(let i=0;i<e.results.length;i++) s += e.results[i][0].transcript;
-      transcriptEl.textContent = s;
-      textInput.value = s;
-    };
-    rec.onerror = () => statusEl.textContent = 'mic: error';
-    rec.onend = () => { recognizing=false; statusEl.textContent='mic: ready'; };
-    recognizing = true; rec.start();
-  } else {
-    statusEl.textContent = 'mic: ready (no browser STT — type & Send)';
-  }
-});
+// replace hold-to-talk logic with real recording upload
+let mediaRec, chunks=[];
+micBtn.onmousedown = async () => {
+  await initMic();
+  const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+  mediaRec = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+  chunks = [];
+  mediaRec.ondataavailable = e => chunks.push(e.data);
+  mediaRec.start();
+  statusEl.textContent = 'mic: recording…';
+};
 
 window.addEventListener('mouseup', async () => {
-  if (rec && recognizing) { rec.stop(); recognizing=false; }
-  const t = (textInput.value || transcriptEl.textContent || '').trim();
-  if (t) { sendToN8N(t, 'hint'); } // auto-send as hint on release
+  if (!mediaRec) return;
+  mediaRec.onstop = async () => {
+    const blob = new Blob(chunks, { type:'audio/webm' });
+    const fd = new FormData();
+    fd.append('file', blob, 'speech.webm');
+    fd.append('mode', 'hint'); // or 'answer'
+
+    replyEl.textContent = '…';
+    const res = await fetch(N8N_WEBHOOK_URL, { method:'POST', body: fd });
+    if (!res.ok) { replyEl.textContent = `n8n error: ${res.status}`; return; }
+
+    // if n8n returns audio (e.g. audio/mpeg), play it
+    const ct = res.headers.get('content-type') || '';
+    const buf = await res.arrayBuffer();
+    const audioBlob = new Blob([buf], { type: ct || 'audio/mpeg' });
+    new Audio(URL.createObjectURL(audioBlob)).play();
+    replyEl.textContent = '(audio reply)';
+    statusEl.textContent = 'mic: ready';
+  };
+  mediaRec.stop();
 });
+
 
 /* Manual send buttons */
 document.getElementById('sendHint').onclick = () => {
